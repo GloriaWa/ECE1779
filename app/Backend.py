@@ -6,12 +6,12 @@ capacity = 16 #Cache initial capacity
 cw = Cache.CacheWrapper(capacity)
 
 
-@f.webapp.route('/')
+@backendApp.route('/')
 def main():
     return f.render_template("main.html")
 
 
-@f.webapp.route('/get', methods=['POST'])
+@backendApp.route('/get', methods=['POST'])
 def get():
     key = f.request.form.get('key')
     if key in cw.memcache:
@@ -31,7 +31,7 @@ def get():
     return response
 
 
-@f.webapp.route('/put', methods=['POST'])
+@backendApp.route('/put', methods=['POST'])
 def put():
     key = f.request.form.get('key')
     value = f.request.form.get('value')
@@ -56,7 +56,7 @@ def clear():
 
     return response
 
-@f.webapp.route('/invalidateKey', methods=['POST'])
+@backendApp.route('/invalidateKey', methods=['POST'])
 def invalidateKey():
     key = f.request.args.get('key')
     cw.invalidateKey(key)
@@ -68,7 +68,7 @@ def invalidateKey():
 
     return response
 
-@f.webapp.route('/refreshConfiguration', methods=['POST'])
+@backendApp.route('/refreshConfiguration', methods=['POST'])
 def refreshConfiguration():
     cap = f.request.args.get('capacity')
     cw.refreshConfigurations(cap)
