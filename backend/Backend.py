@@ -1,6 +1,6 @@
 import flask as f
-import app.CacheWrapper as Cache
-from app import backendApp
+import backend.CacheWrapper as Cache
+from backend import backendApp
 
 capacity = 16 #Cache initial capacity
 cw = Cache.CacheWrapper(capacity)
@@ -13,9 +13,9 @@ def main():
 
 @backendApp.route('/get', methods=['POST'])
 def get():
-    key = f.request.form.get('key')
+    key = f.request.args.get('key')
     if key in cw.memcache:
-        value = cw.memcache[key]
+        value = cw.get(key)
         response = backendApp.response_class(
             response=f.json.dumps(value),
             status=200,
@@ -33,9 +33,9 @@ def get():
 
 @backendApp.route('/put', methods=['POST'])
 def put():
-    key = f.request.form.get('key')
-    value = f.request.form.get('value')
-    cw.memcache[key] = value
+    key = f.request.args.get('key')
+    value = f.request.args.get('value')
+    cw.put(key, value)
 
     response = backendApp.response_class(
         response=f.json.dumps("OK"),

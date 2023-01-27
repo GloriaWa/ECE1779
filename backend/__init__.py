@@ -7,4 +7,4 @@ backendApp = Flask(__name__)
 # def main():
 #     return flask.render_template("main.html")
 
-from app import Backend
+from backend import Backend
