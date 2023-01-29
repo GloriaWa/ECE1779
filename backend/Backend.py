@@ -2,20 +2,20 @@ import flask as f
 import backend.CacheWrapper as Cache
 from backend import backendApp
 
-capacity = 16 #Cache initial capacity
+capacity = 16  # Cache initial capacity
 cw = Cache.CacheWrapper(capacity)
 
 
-@backendApp.route('/')
+@backendApp.route('/api/')
 def main():
     return f.render_template("main.html")
 
 
-@backendApp.route('/get', methods=['POST'])
+@backendApp.route('/api/get', methods=['POST'])
 def get():
     key = f.request.args.get('key')
-    if key in cw.memcache:
-        value = cw.get(key)
+    value = cw.get(key)
+    if value != -1:
         response = backendApp.response_class(
             response=f.json.dumps(value),
             status=200,
@@ -31,11 +31,18 @@ def get():
     return response
 
 
-@backendApp.route('/put', methods=['POST'])
+'''TODO:
+Key is the filename and accordingly file should be the
+base64 code from frontend. But how do we transfer the 
+code (using args or files or somewhat)?
+'''
+
+
+@backendApp.route('/api/put', methods=['POST'])
 def put():
-    key = f.request.args.get('key')
-    value = f.request.args.get('value')
-    cw.put(key, value)
+    key = f.request.args.get('key')  # using args to get key
+    file = f.request.files.get('files')  # using files to get code
+    cw.put(key, file)
 
     response = backendApp.response_class(
         response=f.json.dumps("OK"),
@@ -45,7 +52,8 @@ def put():
 
     return response
 
-@backendApp.route('/clear', methods=['POST'])
+
+@backendApp.route('/api/clear', methods=['POST'])
 def clear():
     cw.clear()
     response = backendApp.response_class(
@@ -56,7 +64,8 @@ def clear():
 
     return response
 
-@backendApp.route('/invalidateKey', methods=['POST'])
+
+@backendApp.route('/api/invalidateKey', methods=['POST'])
 def invalidateKey():
     key = f.request.args.get('key')
     cw.invalidateKey(key)
@@ -68,7 +77,8 @@ def invalidateKey():
 
     return response
 
-@backendApp.route('/refreshConfiguration', methods=['POST'])
+
+@backendApp.route('/api/refreshConfiguration', methods=['POST'])
 def refreshConfiguration():
     cap = f.request.args.get('capacity')
     cw.refreshConfigurations(cap)
@@ -79,3 +89,13 @@ def refreshConfiguration():
     )
 
     return response
+
+
+
+@backendApp.route('/api/stats', methods=['GET'])
+def currentStats():
+    return backendApp.response_class(
+        response=f.json.dumps(cw.displayStats()),
+        status=200,
+        mimetype='application/json'
+    )
