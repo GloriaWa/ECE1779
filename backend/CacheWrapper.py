@@ -1,4 +1,5 @@
 import random
+import sys
 from collections import OrderedDict
 
 
@@ -7,6 +8,7 @@ class CacheWrapper:
     def __init__(self, capacity: int):
         self.memcache = OrderedDict()
         self.capacity = capacity
+        self.replace = 'LRU'
         self.accessCount = 0
         self.hit = 0
         self.entryNum = 0
@@ -27,7 +29,10 @@ class CacheWrapper:
         self.memcache[key] = value
         self.memcache.move_to_end(key)
         self.entryNum += 1
-        self.LRUReplacement()
+        if self.replace == 'LRU':
+            self.LRUReplacement()
+        else:
+            self.RNDReplacement()
 
     def LRUReplacement(self) -> None:
         if len(self.memcache) > self.capacity:
@@ -70,6 +75,12 @@ class CacheWrapper:
                     'accessCount': self.accessCount,
                     'hit': self.hit,
                     'entryNum': self.entryNum,
-                    'cacheInvalidations' : self.cacheInvalidations
+                    'cacheInvalidations' : self.cacheInvalidations,
+                    'replacementPolicy' : self.replace,
+                    'sizeInMegaByte' : sys.getsizeof(self.memcache)
                     }
 
+
+
+    def displayAllKeys(self):
+        return self.memcache.keys()

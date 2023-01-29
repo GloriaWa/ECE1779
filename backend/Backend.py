@@ -81,7 +81,9 @@ def invalidateKey():
 @backendApp.route('/api/refreshConfiguration', methods=['POST'])
 def refreshConfiguration():
     cap = f.request.args.get('capacity')
+    replace = f.request.args.get('replace')
     cw.refreshConfigurations(cap)
+    cw.replace = replace
     response = backendApp.response_class(
         response=f.json.dumps("OK"),
         status=200,
@@ -91,11 +93,19 @@ def refreshConfiguration():
     return response
 
 
-
 @backendApp.route('/api/stats', methods=['GET'])
 def currentStats():
     return backendApp.response_class(
         response=f.json.dumps(cw.displayStats()),
+        status=200,
+        mimetype='application/json'
+    )
+
+
+@backendApp.route('/api/cacheKeys', methods=['GET'])
+def cacheKeys():
+    return backendApp.response_class(
+        response=f.json.dumps(cw.displayAllKeys()),
         status=200,
         mimetype='application/json'
     )
