@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+</head>
+
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+</style>
+<body>
+        <p style="font-size:160%;color:red;" class="center">{{msg}}</p>
+    <form action="/upload" enctype="multipart/form-data" method="post">
+        <p><i>Image preview</i></p>
+        <div style="border: thin solid black">
+            <img id="output" class="center" >
+        </div>
+
+	    <p class="center" >
+        <label>key:</label>
+        <input type="text" name="key" />
+        </p>
+        <p class="center" >
+        <label>image:</label>
+        <input type="file" name="file" accept="image/*" onchange="previewImage(event);" />
+        </p>
+        <p class="center" >
+        <input type="submit" value="Send">
+        <input type="reset" value="reset">
+        </p>
+    </form>
+
+    <form action="/" >
+        <p>
+           <input type="submit" value="return">
+        </p>
+    </form>
+
+    <script>
+    var previewImage = function(event) {
+	    var image = document.getElementById('output');
+	    image.src = URL.createObjectURL(event.target.files[0]);
+
+
+    };
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>find_image</title>
+</head>
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+</style>
+<body>
+        <p style="font-size:160%;color:red;" class="center">{{msg}}</p>
+    <form action="{{ url_for('find')}}" method="post">
+        <p class="center">
+        <label>key:</label>
+        <input type="text" name="key" />
+        <input type="submit" value="get" />
+        </p>
+    </form>
+    <div style="border: thin solid black">
+        <a href="{{image}}" download>
+            <img src="{{image}}" class="center">
+        </a>
+    </div>
+    <p class="center">(Click image to download)</p>
+
+
+    <form action="/" >
+        <p>
+            <input type="submit" value="return">
+        </p>
+    </form>
+</body>
+</html>

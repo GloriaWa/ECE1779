@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <title>memcache config</title>
+</head>
+
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+</style>
+
+<body>
+
+    <div class="center">
+        <p>All keys and of mem_cache are shown below:</p>
+        <p style="font-size:160%;color:red;">{{msg}}</p>
+        {% if all_keys == "" %}
+            <p style="font-size:160%;color:red;">No keys in mem_cache</p>
+        {% else %}
+            <ol>
+                {% for key in all_keys %}
+                    <li>{{key}} </li>
+                {% endfor %}
+            </ol>
+        {% endif %}
+    </div>
+    <form action="/cache_config/clear_cache" >
+        <p>
+           <input type="submit" value="clear all" class="center">
+        </p>
+    </form>
+
+    </div >
+        <p class="center">Configure the mem-cache parameters:</p>
+        <p class="center">1. replace police :</p>
+        <p class="center">2. cache size (in MB) :</p>
+    </div>
+    <form action="/" >
+        <p>
+           <input type="submit" value="return">
+        </p>
+    </form>
+
+</body>
+</html>

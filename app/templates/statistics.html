@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>statistics</title>
+</head>
+
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+table, th, td {
+  border:1px solid black;
+}
+</style>
+
+<body>
+    <div class="center">
+        <p>mem_cache statistics are shown below:</p>
+        {% if log == "" %}
+            <p style="font-size:160%;color:red;">no activity in past 10 mins</p>
+        {% else %}
+            <table>
+                <tr>
+                    <th>time</th>
+                    <th>action</th>
+                </tr>
+                {% for time,action in log.items() %}
+                <tr>
+                    <td>{{time}} </td>
+                    <td>{{action}} </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+
+    <form action="/" >
+        <p>
+           <input type="submit" value="return">
+        </p>
+    </form>
+</body>
+</html>

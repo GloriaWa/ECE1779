@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+table, th, td {
+  border:1px solid black;
+}
+</style>
+
+<head>
+    <meta charset="UTF-8">
+    <title>database config</title>
+</head>
+
+<style>
+.center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 30%;
+}
+</style>
+
+<body>
+
+    <div class="center">
+        <p>All keys and path in database are shown below:</p>
+        <p style="font-size:160%;color:red;">{{msg}}</p>
+        {% if all_keys is defined %}
+            <table>
+                <tr>
+                    <th>Key</th>
+                    <th>file path</th>
+                </tr>
+                {% for key,value in all_keys.items() %}
+                <tr>
+                    <td>{{key}} </td>
+                    <td>{{value}} </td>
+                </tr>
+                {% endfor %}
+            </table>
+        {% endif %}
+    </div>
+    <form action="/db_config/clear_keys" >
+        <p>
+           <input type="submit" value="clear all" class="center">
+        </p>
+    </form>
+    <form action="/" >
+        <p>
+           <input type="submit" value="return">
+        </p>
+    </form>
+
+</body>
+</html>
