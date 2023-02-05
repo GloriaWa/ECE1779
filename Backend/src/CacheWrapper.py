@@ -72,8 +72,12 @@ class CacheWrapper:
         self.replace = replace
 
     def getSize(self):
-        # in Mb
-        return sys.getsizeof(self.memcache) / (1024 * 1024)
+        # Bytes into database, in case of information loss
+        size = 0
+        for i in self.memcache:
+            size += sys.getsizeof(self.memcache[i])
+
+        return size
 
     # def displayStats(self):
     #     if(self.accessCount != 0):

@@ -149,7 +149,7 @@ def cache_stats():
         yy['request_count'].append(r['request_count'])
         yy['miss_count'].append(r['miss_count'])
         yy['hit_count'].append(hit_count)
-        yy['cache_size'].append(r['size'])
+        yy['cache_size'].append(r['size'] / (1024 * 1024))
         yy['item_count'].append(r['item_count'])
 
     # plots
@@ -243,7 +243,7 @@ def upload():
         return jsonify(j)
 
     except Exception as e:
-        j = {"success": "false", "error": {"code": "servererrorcode", "message": "Error"}}
+        j = {"success": "false", "error": {"code": "servererrorcode", "message": e}}
         return (jsonify(j))
 
 @webapp.route('/api/list_keys', methods=['POST'])
@@ -263,12 +263,16 @@ def list_keys():
         return jsonify(j)
 
     except Exception as e:
-        j = {"success": "false", "error": {"code": "servererrorcode", "message": "Error"}}
+        j = {"success": "false", "error": {"code": "servererrorcode", "message": e}}
         return (jsonify(j))
 
 @webapp.route('/api/key/<string:key_value>', methods=['POST'])
 def single_key(key_value):
     try:
+        if key_value == "":
+            jj = {"success": "false", "error": {"code": "servererrorcode", "message": "No such key"}}
+            return (jsonify(jj))
+
         j = {"key": key_value}
         res = requests.post('http://localhost:5001/get', json=j)
         res = res.json()
@@ -297,6 +301,7 @@ def single_key(key_value):
             # the required img is not in the db
             else:
                 jj = {"success": "false", "error": {"code": "servererrorcode", "message": "No such key"}}
+                return (jsonify(jj))
 
         # cache hit
         else:
@@ -304,7 +309,7 @@ def single_key(key_value):
             return jsonify(j)
 
     except Exception as e:
-        f = {"success": "false", "error": {"code": "servererrorcode", "message": "Error"}}
+        f = {"success": "false", "error": {"code": "servererrorcode", "message": e}}
         return (jsonify(f))
 
 
