@@ -243,7 +243,7 @@ def upload():
         return jsonify(j)
 
     except Exception as e:
-        j = {"success": "false", "error": {"code": "servererrorcode", "message": "Error"}}
+        j = {"success": "false", "error": {"code": "servererrorcode", "message": e}}
         return (jsonify(j))
 
 @webapp.route('/api/list_keys', methods=['POST'])
@@ -297,6 +297,7 @@ def single_key(key_value):
             # the required img is not in the db
             else:
                 jj = {"success": "false", "error": {"code": "servererrorcode", "message": "No such key"}}
+                return (jsonify(jj))
 
         # cache hit
         else:

@@ -72,8 +72,8 @@ class CacheWrapper:
         self.replace = replace
 
     def getSize(self):
-        # in Mb
-        return sys.getsizeof(self.memcache) / (1024 * 1024)
+        # in bytes
+        return sys.getsizeof(self.memcache)
 
     # def displayStats(self):
     #     if(self.accessCount != 0):
