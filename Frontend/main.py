@@ -149,7 +149,7 @@ def cache_stats():
         yy['request_count'].append(r['request_count'])
         yy['miss_count'].append(r['miss_count'])
         yy['hit_count'].append(hit_count)
-        yy['cache_size'].append(r['size'])
+        yy['cache_size'].append(r['size'] / (1024 * 1024))
         yy['item_count'].append(r['item_count'])
 
     # plots
