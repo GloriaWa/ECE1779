@@ -10,10 +10,6 @@ capacity = 12  # Cache initial capacity
 
 cw = Cache.CacheWrapper(capacity)
 
-# @backendApp.route('/api/')
-# def main():
-#     return f.render_template("main.html")
-
 @backendApp.route('/get', methods=['POST'])
 def get():
 
@@ -107,21 +103,3 @@ def heartBeatStatus():
         "message": message
     })
 
-
-
-# @backendApp.route('/api/stats', methods=['GET'])
-# def currentStats():
-#     return backendApp.response_class(
-#         response=f.json.dumps(cw.displayStats()),
-#         status=200,
-#         mimetype='application/json'
-#     )
-#
-#
-# @backendApp.route('/api/cacheKeys', methods=['GET'])
-# def cacheKeys():
-#     return backendApp.response_class(
-#         response=f.json.dumps(cw.displayAllKeys()),
-#         status=200,
-#         mimetype='application/json'
-#     )

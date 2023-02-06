@@ -24,9 +24,6 @@ class CacheWrapper:
             return self.memcache[key]
 
     def put(self, key, value):
-        # self.memcache.__setitem__(key, value)
-        # self.memcache.update({key, value})
-
         if self.replace == 'LRU':
             self.LRUReplacement(value)
         else:
@@ -35,12 +32,6 @@ class CacheWrapper:
         self.memcache[key] = value
         self.memcache.move_to_end(key)
         self.entryNum += 1
-
-        # #################
-        # for i in  self.memcache:
-        #     print(i)
-        # #################
-
 
     def LRUReplacement(self, value) -> None:
         if len(self.memcache) + 1 > self.capacity:
@@ -72,33 +63,8 @@ class CacheWrapper:
         self.replace = replace
 
     def getSize(self):
-        # Bytes into database, in case of information loss
         size = 0
         for i in self.memcache:
             size += sys.getsizeof(self.memcache[i])
 
         return size
-
-    # def displayStats(self):
-    #     if(self.accessCount != 0):
-    #         return {'capacity': self.capacity,
-    #                 'accessCount': self.accessCount,
-    #                 'hit': self.hit,
-    #                 'entryNum': self.entryNum,
-    #                 'hitRatio': self.hit / self.accessCount,
-    #                 'cacheInvalidations' : self.cacheInvalidations
-    #                 }
-    #     else:
-    #         return {'capacity': self.capacity,
-    #                 'accessCount': self.accessCount,
-    #                 'hit': self.hit,
-    #                 'entryNum': self.entryNum,
-    #                 'cacheInvalidations' : self.cacheInvalidations,
-    #                 'replacementPolicy' : self.replace,
-    #                 'sizeInMegaByte' : sys.getsizeof(self.memcache)
-    #                 }
-    #
-    #
-    #
-    # def displayAllKeys(self):
-    #     return self.memcache.keys()

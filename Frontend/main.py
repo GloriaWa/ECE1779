@@ -6,7 +6,6 @@ from flask import render_template, request, g, jsonify
 from Frontend import webapp
 from Frontend.Utilities import *
 
-# Memcache host port
 cache_host = "http://3.133.126.14:5001"
 
 @webapp.before_first_request
@@ -32,8 +31,6 @@ def teardown_db(exception):
 @webapp.route('/')
 @webapp.route('/home')
 def home():
-    """ Main route, as well as default location for 404s
-    """
     return render_template("home.html")
 
 @webapp.errorhandler(404)
@@ -57,25 +54,20 @@ def show_image():
     if request.method == 'GET':
         return render_template('show_image.html')
 
-    # POST, need to do some work here
     else:
         key = request.form.get('key')
         j = {"key": key}
         res = requests.post(cache_host + '/get', json=j)
         res = res.json()
 
-        # if not in the cache -> cache miss!
         if (res['message'] == 'miss'):
             cnx = get_db()
             cursor = cnx.cursor(buffered=True)
             query = "SELECT ipath FROM img where ikey= %s"
             cursor.execute(query, (key,))
 
-            # if the required img is in the db, get it / or else, error
             if (cursor._rowcount):
                 img_ = str(cursor.fetchone()[0])
-
-                # Need to close the db connection sooner!!! ********
                 cnx.close()
 
                 img = base64_img(img_)
@@ -84,11 +76,9 @@ def show_image():
 
                 return render_template('show_image.html', exists=True, img=img)
 
-            # the required img is not in the db
             else:
                 return render_template('show_image.html', exists=False, img="no exist")
 
-        # cache hit
         else:
             return render_template('show_image.html', exists=True, img=res['img'])
 
@@ -96,7 +86,6 @@ def show_image():
 def key_list():
     global cache_host
 
-    # get db key list
     cnx = get_db()
     cursor = cnx.cursor()
     query = "SELECT ikey FROM img"
@@ -108,7 +97,6 @@ def key_list():
     db_key_no = len(db_keys)
     cnx.close()
 
-    # get cache key list
     j = {}
     res = requests.post(cache_host + '/get_key_list', json=j)
     res = res.json()
@@ -124,8 +112,6 @@ def key_list():
 @webapp.route('/cache_stats')
 def cache_stats():
     cnx = get_db()
-
-    # Nice dictionary! Like it it make things easier...
     cursor = cnx.cursor(dictionary=True)
 
     stop_time = datetime.datetime.now()
@@ -136,13 +122,10 @@ def cache_stats():
     rows = cursor.fetchall()
     cnx.close()
 
-    # get ready for plotting
     xx = []
     yy = {'item_count': [], 'request_count': [], 'hit_count': [], 'miss_count': [], 'cache_size': []}
 
     for r in rows:
-
-        # prepare the data rows from the database and ready to draw graphs
         hit_count = r['request_count'] - r['miss_count']
         xx.append(r['stime'])
 
@@ -152,7 +135,6 @@ def cache_stats():
         yy['cache_size'].append(r['size'] / (1024 * 1024))
         yy['item_count'].append(r['item_count'])
 
-    # plots
     plots = {}
     for i, values in yy.items():
         plots[i] = plot_graphs(xx, values, i)
@@ -169,21 +151,17 @@ def memcache_config():
         capacity = cache_para[2]
         stra = cache_para[3]
     else:
-        # Cannot query db, set to default
         capacity = 12
         stra = "LRU"
 
     if request.method == 'GET':
         return render_template('memcache_config.html', capacity=capacity, strategy=stra)
 
-    # POST, need to do some work
     else:
-        # if request to clear the cache
         if request.form.get("clear_cache") != None:
             requests.post(cache_host + '/clear')
             return render_template('memcache_config.html', capacity=capacity, strategy=stra, status="mem_clear")
 
-        # else if request to clear ALL
         elif request.form.get("clear_all") != None:
             requests.post(cache_host + '/clear')
 
@@ -192,12 +170,8 @@ def memcache_config():
 
             return render_template('memcache_config.html', capacity=capacity, strategy=stra, status="all_clear")
 
-        # else, take the new cache parameters
         else:
             new_cap = request.form.get('capacity')
-            # log ##########################
-            # print(new_cap)
-
             if new_cap.isdigit() and int(new_cap) <= 20:
 
                 strategy_selected = request.form.get('replacement_policy')
@@ -208,13 +182,11 @@ def memcache_config():
 
                 status = set_cache_parameter(new_cap, new_strategy)
 
-                # if successs
                 if status != None:
                     res = requests.post(cache_host + '/refreshConfiguration')
                     if res.json()['message'] == 'ok':
                         return render_template('memcache_config.html', capacity=new_cap, strategy=new_strategy, status="suc")
 
-            # Error happen
             return render_template('memcache_config.html', capacity=capacity, strategy=stra, status="fail")
 
 
@@ -277,18 +249,14 @@ def single_key(key_value):
         res = requests.post('http://3.133.126.14:5001/get', json=j)
         res = res.json()
 
-        # if not in the cache -> cache miss!
         if (res['message'] == 'miss'):
             cnx = get_db()
             cursor = cnx.cursor(buffered=True)
             query = "SELECT ipath FROM img where ikey= %s"
             cursor.execute(query, (key_value,))
 
-            # if the required img is in the db, get it / or else, error
             if (cursor._rowcount):
                 img_ = str(cursor.fetchone()[0])
-
-                # Need to close the db connection sooner!!! ********
                 cnx.close()
 
                 img = base64_img(img_)
@@ -298,12 +266,10 @@ def single_key(key_value):
                 jj = {"success": "true", "key": key_value, "content": img}
                 return (jsonify(jj))
 
-            # the required img is not in the db
             else:
                 jj = {"success": "false", "error": {"code": "servererrorcode", "message": "No such key"}}
                 return (jsonify(jj))
 
-        # cache hit
         else:
             j = {"success": "true", "key": key_value, "content": res['img']}
             return jsonify(j)
