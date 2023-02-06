@@ -6,7 +6,7 @@ from matplotlib.figure import Figure
 
 
 EXT = {'.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif'}
-cache_host = "http://localhost:5001"
+cache_host = "http://3.133.126.14:5001"
 
 def get_cache_parameter():
     """ Get the newest cache parameters from the database, return the resulting row from the database """

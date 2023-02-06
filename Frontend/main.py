@@ -7,7 +7,7 @@ from Frontend import webapp
 from Frontend.Utilities import *
 
 # Memcache host port
-cache_host = "http://localhost:5001"
+cache_host = "http://3.133.126.14:5001"
 
 @webapp.before_first_request
 def initial_settings():
@@ -274,7 +274,7 @@ def single_key(key_value):
             return (jsonify(jj))
 
         j = {"key": key_value}
-        res = requests.post('http://localhost:5001/get', json=j)
+        res = requests.post('http://3.133.126.14:5001/get', json=j)
         res = res.json()
 
         # if not in the cache -> cache miss!
