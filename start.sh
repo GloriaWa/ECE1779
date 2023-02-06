@@ -1,2 +1,2 @@
-python3 "runFront"
-python3 "runBack"
+python3 "runFront.py"
+python3 "runBack.py"
