@@ -16,6 +16,7 @@ cw = Cache.CacheWrapper(capacity)
 
 @backendApp.route('/get', methods=['POST'])
 def get():
+    """ get an img based on a key, might cache hit or miss, if miss, the frontend will initialized a memcache update """
 
     js = f.request.get_json(force=True)
     key = js["key"]
@@ -36,6 +37,8 @@ def get():
 
 @backendApp.route('/put', methods=['POST'])
 def put():
+    """ put a new img into the memcache, the CacheWrapper will deal with possible deletes and updates in the memcache """
+
     js = f.request.get_json(force=True)
     key = js["key"]
     img = js["img"]
@@ -48,6 +51,8 @@ def put():
 
 @backendApp.route('/clear', methods=['POST'])
 def clear():
+    """ clear the cache """
+
     cw.clear()
 
     message = "ok"
@@ -57,6 +62,7 @@ def clear():
 
 @backendApp.route('/invalidate', methods=['POST'])
 def invalidateKey():
+    """ delete a specific key from the memcache if exist """
 
     js = f.request.get_json(force=True)
     cw.invalidate(js["key"])
@@ -68,6 +74,7 @@ def invalidateKey():
 
 @backendApp.route('/get_key_list', methods=['POST'])
 def getKeyList():
+    """ return all keys stored in the memcache """
 
     count = len(cw.memcache)
 
@@ -83,6 +90,8 @@ def getKeyList():
 
 @backendApp.route('/refreshConfiguration', methods=['POST'])
 def refreshConfiguration():
+    """ based on the user request, reset the memcache parameters (size and strategy) """
+
     cache_params = get_cache_parameter()
 
     cap = cache_params[2]
@@ -96,6 +105,8 @@ def refreshConfiguration():
 
 @backendApp.route('/stats', methods=['POST'])
 def heartBeatStatus():
+    """ method that return the current memcache statistics information (will be stored in the db every 5 seconds) """
+
     item_count = len(cw.memcache)
     request_count = cw.accessCount
     miss_count = cw.accessCount - cw.hit

@@ -6,7 +6,7 @@ from flask import render_template, request, g, jsonify
 from Frontend import webapp
 from Frontend.Utilities import *
 
-# Memcache host port
+# Memcache host, when backend running, call this address to interact with the memcache
 cache_host = "http://localhost:5001"
 
 @webapp.before_first_request
@@ -16,6 +16,7 @@ def initial_settings():
     t.start()
 
 def pollStatus():
+    """ When the server is up, call backend every 5 seconds. The backend will upload its status information to the db, and this info is used for the statistics """
     global cache_host
 
     while True:
@@ -32,8 +33,7 @@ def teardown_db(exception):
 @webapp.route('/')
 @webapp.route('/home')
 def home():
-    """ Main route, as well as default location for 404s
-    """
+    """ Home page, has the nevigatoin bar to all other functoinalities """
     return render_template("home.html")
 
 @webapp.errorhandler(404)
@@ -42,6 +42,8 @@ def not_found(e):
 
 @webapp.route('/add_img', methods=['GET', 'POST'])
 def add_img():
+    """ add a new image to the file system and the db. Noticed that when adding a image, the memcache will not be triggered """
+
     if request.method == 'POST':
 
         key = request.form.get('key')
@@ -52,8 +54,12 @@ def add_img():
 
 @webapp.route('/show_image', methods=['GET', 'POST'])
 def show_image():
+    """ show an image (or return fail if no such image in the file system), first check if memcache has this image, if not, then query the database,
+    and retrive the image from the file system base on the getting result from the database """
+
     global cache_host
 
+    # just showing the page if it is a GET request
     if request.method == 'GET':
         return render_template('show_image.html')
 
@@ -78,6 +84,7 @@ def show_image():
                 # Need to close the db connection sooner!!! ********
                 cnx.close()
 
+                # put the img into the cache since it is the latest visited item
                 img = base64_img(img_)
                 j = {"key":key, "img":img}
                 res = requests.post(cache_host + '/put', json=j)
@@ -88,12 +95,15 @@ def show_image():
             else:
                 return render_template('show_image.html', exists=False, img="no exist")
 
-        # cache hit
+        # cache hit, just return the img from the cache
         else:
             return render_template('show_image.html', exists=True, img=res['img'])
 
 @webapp.route('/key_list')
 def key_list():
+    """ show all the keys stored in the database, and show all the keys stored in the memcache
+     if no keys in the destination, tell the user that it might because the destination is empty or some error occur """
+
     global cache_host
 
     # get db key list
@@ -123,6 +133,8 @@ def key_list():
 
 @webapp.route('/cache_stats')
 def cache_stats():
+    """ show the cache statistics page, and graphs that show the parameters of the cache will be shown """
+
     cnx = get_db()
 
     # Nice dictionary! Like it it make things easier...
@@ -149,10 +161,12 @@ def cache_stats():
         yy['request_count'].append(r['request_count'])
         yy['miss_count'].append(r['miss_count'])
         yy['hit_count'].append(hit_count)
+
+        # in MB, and the data in the db is in Bytes, so need to do the division
         yy['cache_size'].append(r['size'] / (1024 * 1024))
         yy['item_count'].append(r['item_count'])
 
-    # plots
+    # plot the graphs, the plotted graphs will be shown in the page, and graphs are updated every 5 seconds, since new data will be pushed to the db every 5 seconds
     plots = {}
     for i, values in yy.items():
         plots[i] = plot_graphs(xx, values, i)
@@ -162,6 +176,10 @@ def cache_stats():
 
 @webapp.route('/memcache_config', methods=['GET', 'POST'])
 def memcache_config():
+    """ take the request from the user to reconfigure the memcache, size and strategy can be changed
+     in addition, the user can also clear the memcache, or clear all the data in the file system, database, and memcache
+     (not including the history stats data and history config data in the db) """
+
     global cache_host
     cache_para = get_cache_parameter()
 
@@ -169,7 +187,7 @@ def memcache_config():
         capacity = cache_para[2]
         stra = cache_para[3]
     else:
-        # Cannot query db, set to default
+        # Cannot query db, set to default initial value
         capacity = 12
         stra = "LRU"
 
@@ -211,6 +229,7 @@ def memcache_config():
                 # if successs
                 if status != None:
                     res = requests.post(cache_host + '/refreshConfiguration')
+
                     if res.json()['message'] == 'ok':
                         return render_template('memcache_config.html', capacity=new_cap, strategy=new_strategy, status="suc")
 
@@ -219,6 +238,7 @@ def memcache_config():
 
 
 ######### auto test api #########
+""" The following are apis that only used in auto testing, they are NOT used when normally running the application on the browser """
 
 @webapp.route('/api/delete_all', methods=['POST'])
 def api_delete_all():

@@ -4,8 +4,10 @@ from Frontend import IMG_FOLDER
 from io import BytesIO
 from matplotlib.figure import Figure
 
-
+# all allowed extensions for the uploaded img
 EXT = {'.txt', '.pdf', '.png', '.jpg', '.jpeg', '.gif'}
+
+# This is a local running server
 cache_host = "http://localhost:5001"
 
 def get_cache_parameter():
@@ -61,7 +63,8 @@ def set_status(size, item_count, request_count, miss_count):
         return None
 
 def save_image(request, key):
-    """ Save a new image into the local file system and add the key-path pair to the database """
+    """ Save a new image into the local file system and add the key-path pair into the database """
+
     global cache_host
 
     file = request.files['file']
@@ -85,6 +88,8 @@ def save_image(request, key):
     return "invalid"
 
 def clear_folder():
+    """ empty the image folder """
+
     for filename in os.listdir(IMG_FOLDER):
         path = os.path.join(IMG_FOLDER, filename)
 
@@ -99,6 +104,8 @@ def clear_folder():
     return "success"
 
 def clear_db():
+    """ empty the img table in the database """
+
     try:
         cnx = get_db()
         cursor = cnx.cursor(buffered=True)

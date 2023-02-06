@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 
 class CacheWrapper:
+    """ The memcache instance, has all functions that will allow the other to manipulate the memcache instance """
 
     def __init__(self, capacity: int):
         self.memcache = OrderedDict()
