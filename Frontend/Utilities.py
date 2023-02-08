@@ -58,7 +58,7 @@ def save_image(request, key):
     file = request.files['file']
     name, ex = os.path.splitext(file.filename)
 
-    if ex.lower() in EXT and sys.getsizeof(file) < 2097152:
+    if ex.lower() in EXT:
         filename = key + ex
 
         file.save(os.path.join(IMG_FOLDER, filename))
