@@ -6,7 +6,7 @@ from flask import render_template, request, g, jsonify
 from Frontend import webapp
 from Frontend.Utilities import *
 
-cache_host = "http://3.133.126.14:5001"
+cache_host = "http://3.143.22.33:5001"
 
 @webapp.before_first_request
 def initial_settings():
