@@ -246,7 +246,7 @@ def single_key(key_value):
             return (jsonify(jj))
 
         j = {"key": key_value}
-        res = requests.post('http://3.133.126.14:5001/get', json=j)
+        res = requests.post('http://3.143.22.33:5001/get', json=j)
         res = res.json()
 
         if (res['message'] == 'miss'):
